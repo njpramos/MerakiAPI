@@ -17,7 +17,7 @@ organization_id = os.environ.get('APMEA_ORG_ID')
 
 # Initialize the local path directory
 
-path = r'C:\Users\nomer.ramos\Documents\CMN_Backup_Jan_2023'
+path = os.environ.get('DIR_PATH')
 
 # Extract all the Network IDs from an Org ID
 
