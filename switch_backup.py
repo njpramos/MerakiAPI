@@ -60,10 +60,8 @@ def get_device_switchport(serial):
         switchport_list = []
         
         for port in switchports:
+        
             switchport_list.append(json.dumps(port, indent = 4))
-            
-            
-        #print(switchport_list)
 
         return switchport_list
 
@@ -75,25 +73,25 @@ try:
         devices = get_network_devices(network_id)
         #print("\n ================ " + get_network_name(devices[0]['networkId']) + " ================ \n")
         if len(devices) != 0: 
-            #new_path = path + r'\\' + get_network_name(devices[0]['networkId'])
-            #if not os.path.exists(new_path):
-            #    os.makedirs(new_path)
+            new_path = path + r'\\' + get_network_name(devices[0]['networkId'])
+            if not os.path.exists(new_path):
+               os.makedirs(new_path)
             for device in devices:
                 if device['model'].find('MS') != -1:
                 #print(type(device))
                     if "name" in device:
-                        print("Switch Name: " + device['name'] + " \n " + "Serial No.: " + device['serial'] + " \n", get_device_switchport(device['serial']))
-                        # file_path = os.path.join(new_path + '\\', device['name'] + ".txt") 
-                        # with open(file_path, "w") as text_file:
-                            # device_list = get_device_switchport(device['serial'])
-                            # text_file.write(device['serial'] + "\n\n" + "".join(str(f) for f in device_list))
+                        #print("Switch Name: " + device['name'] + " \n " + "Serial No.: " + device['serial'] + " \n", get_device_switchport(device['serial']))
+                        file_path = os.path.join(new_path + '\\', device['name'] + ".txt") 
+                        with open(file_path, "w") as text_file:
+                            device_list = get_device_switchport(device['serial'])
+                            text_file.write(device['serial'] + "\n\n" + "".join(str(f) for f in device_list))
                            
                     else:
-                        print("Switch Name: " + device['mac'] + " \n " + "Serial No.: " + device['serial'] + " \n ", get_device_switchport(device['serial']))
-                        # file_path = os.path.join(new_path + '\\', device['mac'] + ".txt")
-                        # with open(file_path, "w") as text_file:
-                            # device_list = get_device_switchport(device['serial'])
-                            # text_file.write(device['mac'] + "\n\n" + "".join(str(f) for f in device_list))
+                        #print("Switch Name: " + device['mac'] + " \n " + "Serial No.: " + device['serial'] + " \n ", get_device_switchport(device['serial']))
+                        file_path = os.path.join(new_path + '\\', device['mac'] + ".txt")
+                        with open(file_path, "w") as text_file:
+                            device_list = get_device_switchport(device['serial'])
+                            text_file.write(device['mac'] + "\n\n" + "".join(str(f) for f in device_list))
 except KeyboardInterrupt:
     print("Program Interrupted")
 except:
