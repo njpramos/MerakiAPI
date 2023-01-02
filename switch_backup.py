@@ -1,6 +1,7 @@
 import meraki
 import os
 import json
+import datetime
 from dotenv import load_dotenv
 
 # load the environment variable
@@ -11,63 +12,72 @@ load_dotenv()
 
 key = os.environ.get('API_KEY')
 
+# Create an instance of Meraki Dashboard API
+
 dashboard = meraki.DashboardAPI(key)
+
+# Initialize the Organization ID from .env file 
 
 organization_id = os.environ.get('APMEA_ORG_ID')
 
+date_created = datetime.datetime.now() # Generates a dynamic date/year info
+
 # Initialize the local path directory
 
-path = os.environ.get('DIR_PATH')
+path = os.environ.get('DIR_PATH') + date_created.strftime('%b') + "_" + date_created.strftime('%Y')
+
+path.encode('unicode_escape') # Escape the backslashes '\' 
 
 # Extract all the Network IDs from an Org ID
 
 def get_network_id(org_id):
 
-        networks = dashboard.organizations.getOrganizationNetworks(org_id)
+    networks = dashboard.organizations.getOrganizationNetworks(org_id)
 
-        network_list = []
-        
-        for network in networks:
-                
-            network_list.append(network['id'])
-                
-        return network_list
+    network_list = []
+    
+    for network in networks:
+            
+        network_list.append(network['id'])
+            
+    return network_list
         
 # Extract the Network name from a Network ID
         
 def get_network_name(net_id):
 
-        response = dashboard.networks.getNetwork(net_id)
-        
-        network_name = response['name'].strip()
-        
-        return network_name
+    response = dashboard.networks.getNetwork(net_id)
+    
+    network_name = response['name'].strip()
+    
+    return network_name
 
 # Extract all the Network devices from a Network ID
         
 def get_network_devices(net_id):
         
-        net_devices = dashboard.networks.getNetworkDevices(net_id)
+    net_devices = dashboard.networks.getNetworkDevices(net_id)
 
-        return net_devices
+    return net_devices
         
 # Extract all the switchport configuration from a switch serial no.
 
 def get_device_switchport(serial):
 
-        switchports = dashboard.switch.getDeviceSwitchPorts(serial)
-        
-        switchport_list = []
-        
-        for port in switchports:
-        
-            switchport_list.append(json.dumps(port, indent = 4))
+    switchports = dashboard.switch.getDeviceSwitchPorts(serial)
+    
+    switchport_list = []
+    
+    for port in switchports:
+    
+        switchport_list.append(json.dumps(port, indent = 4))
 
-        return switchport_list
+    return switchport_list
 
 # Main program
 
-network_id_list = get_network_id(organization_id)
+network_id_list = get_network_id(organization_id) # Call the function to extract all the Network IDs and store in a list
+
 try:
     for network_id in network_id_list:
         devices = get_network_devices(network_id)
@@ -77,9 +87,9 @@ try:
             if not os.path.exists(new_path):
                os.makedirs(new_path)
             for device in devices:
-                if device['model'].find('MS') != -1:
+                if device['model'].find('MS') != -1: # Extract only MS switch devices
                 #print(type(device))
-                    if "name" in device:
+                    if "name" in device: # Execute if the switch has a label/hostname
                         #print("Switch Name: " + device['name'] + " \n " + "Serial No.: " + device['serial'] + " \n", get_device_switchport(device['serial']))
                         file_path = os.path.join(new_path + '\\', device['name'] + ".txt") 
                         with open(file_path, "w") as text_file:
