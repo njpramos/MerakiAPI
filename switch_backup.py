@@ -85,24 +85,25 @@ try:
         if len(devices) != 0:
             network_name = get_network_name(devices[0]['networkId'])
             new_path = path + r'\\' + network_name
-            if not os.path.exists(new_path) and network_name.find("LAB") == -1: # Create directory for CMN sites
-               os.makedirs(new_path)
-            for device in devices:
-                if device['model'].find('MS') != -1 and network_name.find("LAB") == -1: # Extract only CMN MS switch devices
-                #print(type(device))
-                    if "name" in device: # Execute if the switch has a label/hostname
-                        #print("Switch Name: " + device['name'] + " \n " + "Serial No.: " + device['serial'] + " \n", get_device_switchport(device['serial']))
-                        file_path = os.path.join(new_path + '\\', device['name'] + ".txt") 
-                        with open(file_path, "w") as text_file:
-                            device_list = get_device_switchport(device['serial'])
-                            text_file.write(device['serial'] + "\n\n" + "".join(str(f) for f in device_list))
-                           
-                    else:
-                        #print("Switch Name: " + device['mac'] + " \n " + "Serial No.: " + device['serial'] + " \n ", get_device_switchport(device['serial']))
-                        file_path = os.path.join(new_path + '\\', device['mac'] + ".txt")
-                        with open(file_path, "w") as text_file:
-                            device_list = get_device_switchport(device['serial'])
-                            text_file.write(device['mac'] + "\n\n" + "".join(str(f) for f in device_list))
+            if network_name.find("LAB") == -1:
+                if not os.path.exists(new_path): # Create directory for CMN sites
+                   os.makedirs(new_path)
+                for device in devices:
+                    if device['model'].find('MS') != -1: # Extract only CMN MS switch devices
+                    #print(type(device))
+                        if "name" in device: # Execute if the switch has a label/hostname
+                            #print("Switch Name: " + device['name'] + " \n " + "Serial No.: " + device['serial'] + " \n", get_device_switchport(device['serial']))
+                            file_path = os.path.join(new_path + '\\', device['name'] + ".txt") 
+                            with open(file_path, "w") as text_file:
+                                device_list = get_device_switchport(device['serial'])
+                                text_file.write(device['serial'] + "\n\n" + "".join(str(f) for f in device_list))
+                               
+                        else:
+                            #print("Switch Name: " + device['mac'] + " \n " + "Serial No.: " + device['serial'] + " \n ", get_device_switchport(device['serial']))
+                            file_path = os.path.join(new_path + '\\', device['mac'] + ".txt")
+                            with open(file_path, "w") as text_file:
+                                device_list = get_device_switchport(device['serial'])
+                                text_file.write(device['mac'] + "\n\n" + "".join(str(f) for f in device_list))
 except KeyboardInterrupt:
     print("Program Interrupted")
 except:
