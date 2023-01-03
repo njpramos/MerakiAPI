@@ -26,7 +26,7 @@ date_created = datetime.datetime.now() # Generates a dynamic date/year info
 
 path = os.environ.get('DIR_PATH') + date_created.strftime('%b') + "_" + date_created.strftime('%Y')
 
-path.encode('unicode_escape') # Escape the backslashes '\' 
+# path.encode('unicode_escape') # Escape the backslashes '\' 
 
 # Extract all the Network IDs from an Org ID
 
@@ -65,7 +65,7 @@ def get_network_devices(net_id):
 def get_device_switchport(serial):
 
     switchports = dashboard.switch.getDeviceSwitchPorts(serial)
-    
+     
     switchport_list = []
     
     for port in switchports:
@@ -82,12 +82,13 @@ try:
     for network_id in network_id_list:
         devices = get_network_devices(network_id)
         #print("\n ================ " + get_network_name(devices[0]['networkId']) + " ================ \n")
-        if len(devices) != 0: 
-            new_path = path + r'\\' + get_network_name(devices[0]['networkId'])
-            if not os.path.exists(new_path):
+        if len(devices) != 0:
+            network_name = get_network_name(devices[0]['networkId'])
+            new_path = path + r'\\' + network_name
+            if not os.path.exists(new_path) and network_name.find("LAB") == -1: # Create directory for CMN sites
                os.makedirs(new_path)
             for device in devices:
-                if device['model'].find('MS') != -1: # Extract only MS switch devices
+                if device['model'].find('MS') != -1 and network_name.find("LAB") == -1: # Extract only CMN MS switch devices
                 #print(type(device))
                     if "name" in device: # Execute if the switch has a label/hostname
                         #print("Switch Name: " + device['name'] + " \n " + "Serial No.: " + device['serial'] + " \n", get_device_switchport(device['serial']))
