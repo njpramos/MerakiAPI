@@ -2,6 +2,7 @@ import meraki
 import os
 import json
 import datetime
+import argparse
 from dotenv import load_dotenv
 
 # load the environment variable
@@ -15,10 +16,6 @@ key = os.environ.get('API_KEY')
 # Create an instance of Meraki Dashboard API
 
 dashboard = meraki.DashboardAPI(key)
-
-# Initialize the Organization ID from .env file 
-
-organization_id = os.environ.get('APMEA_ORG_ID')
 
 date_created = datetime.datetime.now() # Generates a dynamic date/year info
 
@@ -74,9 +71,15 @@ def get_device_switchport(serial):
 
     return switchport_list
 
-# Main program
+# Initializes the program and parsing the organization ID from the CLI
 
-network_id_list = get_network_id(organization_id) # Call the function to extract all the Network IDs and store in a list
+parser = argparse.ArgumentParser(prog = '[py | python3] switch_backup.py', description = 'Extracts swichport configurations for all the networks in an organization and save it to a text file', epilog= 'Help')
+
+parser.add_argument('-o', '--organization', default='464068', help = 'A valid Meraki organization ID')
+
+args = parser.parse_args()
+
+network_id_list = get_network_id(args.organization) # Call the function to extract all the Network IDs and store in a list
 
 try:
     for network_id in network_id_list:
