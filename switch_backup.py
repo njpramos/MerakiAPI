@@ -108,14 +108,15 @@ def main():
  
 # Initializes the program and parsing the organization ID from the CLI
 
-parser = argparse.ArgumentParser(prog = '[py | python3] switch_backup.py', description = 'Extracts swichport configurations for all the networks in an organization and save it to a text file', epilog = 'i.e. py switch_backup.py -o 123456')
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(prog = '[py | python3] switch_backup.py', description = 'Extracts swichport configurations for all the networks in an organization and save it to a text file', epilog = 'i.e. py switch_backup.py -o 123456')
 
-parser.add_argument('-o', '--organization', help = 'A valid Meraki organization ID')
+    parser.add_argument('-o', '--organization', help = 'A valid Meraki organization ID')
 
-args = parser.parse_args()
+    args = parser.parse_args()
 
-if args.organization != None:
-    network_id_list = get_network_id(args.organization) # Call the function to extract all the Network IDs and store in a list
-    main() # Invoke the main function
-else:
-    parser.print_help()
+    if args.organization != None:
+        network_id_list = get_network_id(args.organization) # Call the function to extract all the Network IDs and store in a list
+        main() # Invoke the main function
+    else:
+        parser.print_help()
