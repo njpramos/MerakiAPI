@@ -81,10 +81,10 @@ for org in ORGANIZATIONS:
   
                     for user in users:
                         if user['email'] == 'visitor@mcd.com':
-                            #print(user['id'])
-                            response = dashboard.networks.updateNetworkMerakiAuthUser(network['id'], user['id'], secret = 'Strawberry')
+                            print(user['id'])
+                            #response = dashboard.networks.updateNetworkMerakiAuthUser(network['id'], user['id'], secret = 'Strawberry')
                             
-                            print(response)
+                            #print(response)
         print("="*10)
         # if ssid['splashMethod'] == 'Password-protected with Meraki RADIUS':
             # print(network_name, ssid['ssidNumber'])
