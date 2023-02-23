@@ -1,6 +1,8 @@
 import meraki
+import meraki.aio
+import asyncio
 import os
-import threading
+import time
 from dotenv import load_dotenv
 
 # load the environment variable
@@ -14,36 +16,10 @@ key = os.environ.get('API_KEY')
 # Initialize Organization IDs in a list
 
 ORGANIZATIONS = ['464068', '291795']
-
-# Create an instance of Meraki Dashboard API
-
-dashboard = meraki.DashboardAPI(api_key = key, output_log = False, print_console = False)
-
-def get_network_id(org_id):
-
-    networks = dashboard.organizations.getOrganizationNetworks(org_id)
-
-    network_list = []
     
-    for network in networks:
-            
-        network_list.append(network['id'])
-            
-    return network_list
+async def has_wireless(aiomeraki: meraki.aio.AsyncDashboardAPI, net_id):
 
-# Extract the Network name from a Network ID
-        
-def get_network_name(net_id):
-
-    response = dashboard.networks.getNetwork(net_id)
-    
-    network_name = response['name'].strip()
-    
-    return network_name
-    
-def has_wireless(net_id):
-
-    response = dashboard.networks.getNetwork(net_id)
+    response = await aiomeraki.networks.getNetwork(net_id)
    
     if response['productTypes'].count('wireless') >= 1:
     
@@ -54,41 +30,72 @@ def has_wireless(net_id):
 # def update_secret(net_id, user_id):
     
     # response = dashboard.networks.updateNetworkMerakiAuthUser(network_id, meraki_auth_user_id, secret = 'Strawberry')
-
-for org in ORGANIZATIONS:
     
-    networks = dashboard.organizations.getOrganizationNetworks(org)
+    
+async def change_psk(aiomeraki: meraki.aio.AsyncDashboardAPI, net):
 
-    for network in networks:
-        #network_id = print(network['id'])
-        network_name = get_network_name(network['id'])
-        #print(network_name)
-        if has_wireless(network['id']):
-        
+    if await has_wireless(aiomeraki, net['id']):
 
-            ssids = dashboard.wireless.getNetworkWirelessSsids(network['id'])
+        ssids = await aiomeraki.wireless.getNetworkWirelessSsids(net['id'])
 
-            #ssid = dashboard.wireless.getNetworkWirelessSsidSplashSettings(network['id'], 2)
-            #print("="*10)
-            
-            for ssid in ssids:
-
-                if ssid['name'] == 'McD-Guest' and ssid['enabled'] == True and ssid['splashPage'] == 'Password-protected with Meraki RADIUS':
-                    print(network_name)
-                    #print(ssid['number'], ssid['name'])
+                    #ssid = dashboard.wireless.getNetworkWirelessSsidSplashSettings(network['id'], 2)
+                    #print("="*10)
                     
-                    users = dashboard.networks.getNetworkMerakiAuthUsers(network['id'])
-  
-                    for user in users:
-                        if user['email'] == 'visitor@mcd.com':
-                            print(user['id'])
-                            #response = dashboard.networks.updateNetworkMerakiAuthUser(network['id'], user['id'], secret = 'Strawberry')
+        for ssid in ssids:
+
+            if ssid['name'] == 'McD-Guest' and ssid['enabled'] == True and ssid['splashPage'] == 'Password-protected with Meraki RADIUS':
                             
-                            #print(response)
-        print("="*10)
-        # if ssid['splashMethod'] == 'Password-protected with Meraki RADIUS':
-            # print(network_name, ssid['ssidNumber'])
+                            #print(network_name)
+                            #print(ssid['number'], ssid['name'])
+                            
+                users = await aiomeraki.networks.getNetworkMerakiAuthUsers(net['id'])
         
-        # get network SSIDS
+                for user in users:
+                    if user['id'] == 'dmlzaXRvckBtY2QuY29tLEd1ZXN0':
+                    
+                        #response = dashboard.networks.updateNetworkMerakiAuthUser(network['id'], user['id'], secret = 'Strawberry')
+                        
+                        #print(user['id'])
+                        
+                        return net['name']
+
+async def main ():
+
+    async with meraki.aio.AsyncDashboardAPI(
+            key,
+            base_url="https://api.meraki.com/api/v1",
+            output_log = False,
+            print_console = False
+    ) as aiomeraki:
+
+
+        for org in ORGANIZATIONS:
+            
+            networks = await aiomeraki.organizations.getOrganizationNetworks(org)
+            
+            network_task = [change_psk(aiomeraki, net) for net in networks]
+            
+            for task in asyncio.as_completed(network_task):
+            
+                network_name = await task
+                
+                time.sleep(0.5)
+                
+                #if network_name != None:
+                print(f"{network_name} password changed!")
+                
+                #print(network_name)
+                
+                                    #response = dashboard.networks.updateNetworkMerakiAuthUser(network['id'], user['id'], secret = 'Strawberry')
+                                    
+                                    #print(response)
+                
+            # if ssid['splashMethod'] == 'Password-protected with Meraki RADIUS':
+                # print(network_name, ssid['ssidNumber'])
+            
+            # get network SSIDS
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
     
 
