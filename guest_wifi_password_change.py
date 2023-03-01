@@ -38,29 +38,6 @@ def get_secret():
 
                 return row['Secret']
 
-# PSK = {
-    # "Jan": "Apple",
-    # "Feb": "Chocolate",
-    # "Mar": "Strawberry",
-    # "Apr": "Mango",
-    # "May": "Banana",
-    # "Jun": "Coconut",
-    # "Jul": "Chicken",
-    # "Augt": "Passionfruit",
-    # "Sep": "Oreo",
-    # "Oct": "Caramel",
-    # "Nov": "Pineapple",
-    # "Dec": "Cheese",
-# }
-
-# Get the current month
-
-# d = datetime.datetime.now()
-
-# MONTH = d.strftime('%b')
-
-# Check if the network has a Wireless device
-
 async def has_wireless(aiomeraki: meraki.aio.AsyncDashboardAPI, net_id):
 
     response = await aiomeraki.networks.getNetwork(net_id)
@@ -94,9 +71,9 @@ async def change_psk(aiomeraki: meraki.aio.AsyncDashboardAPI, net):
                     # Extract the guest user account for each network
                 
                     if user['id'] == 'dmlzaXRvckBtY2QuY29tLEd1ZXN0':
-                        #secret = get_secret()
+                       
                         response = dashboard.networks.updateNetworkMerakiAuthUser(net['id'], user['id'], password = get_secret())
-                        print(response)
+                        
                         return net['name']
 
 # Main function to initialize Meraki Asynchronous API and coroutines
@@ -128,8 +105,8 @@ async def main ():
                     
                     if network_name != None:
                     
-                        print("="*50)
                         print(f"{network_name} guest WiFi password changed to {get_secret()}")
+                        
                         print("="*50)
                         
         except KeyboardInterrupt:
