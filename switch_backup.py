@@ -32,7 +32,7 @@ path = os.environ.get('DIR_PATH') + date_created.strftime('%b') + "_" + date_cre
 
 # Append a timestamp for folder versioning
 
-version = date_created.strftime('%w_%b_%Y_%H_%M')
+version = date_created.strftime('%d_%b_%Y_%H_%M')
 
 # version = date_created.strftime('%w') + "_" + date_created.strftime('%b') + "_" + date_created.strftime('%Y') + "_"  + date_created.strftime('%H') + date_created.strftime('%M')
 

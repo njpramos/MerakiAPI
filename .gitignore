@@ -3,4 +3,5 @@
 *.txt
 *.exe
 *.log
+*.csv
 doesitcache-script.py
