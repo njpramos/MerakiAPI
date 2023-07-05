@@ -124,7 +124,7 @@ async def save_swport_config(aiomeraki: meraki.aio.AsyncDashboardAPI, net, org_p
                                     
                             else: # Execute otherwise (using MAC address as default label/hostname)
                             
-                                file_path = os.path.join(new_path + '\\', device['mac'] + ".txt")
+                                file_path = os.path.join(new_path + '\\', device['mac'].replace(":","-") + ".txt")
     
                                 with open(file_path, "w") as text_file:
                                 
